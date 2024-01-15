@@ -1,0 +1,66 @@
+import org.jxls.common.Context;
+import org.jxls.transform.poi.PoiTransformer;
+import org.jxls.util.JxlsHelper;
+
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public class JettExample {
+
+    public static void main(String[] args) throws Exception {
+        // Load the template
+        try (InputStream templateInputStream = JettExample.class.getResourceAsStream("/template.xlsx")) {
+            try (OutputStream outputStream = new FileOutputStream("output.xlsx")) {
+                // Create Jxls transformer
+                PoiTransformer transformer = PoiTransformer.createTransformer(templateInputStream, outputStream);
+
+                // Create a data context
+                Context context = new Context();
+                List<Employee> employees = generateRandomEmployees(100);
+                context.putVar("employees", employees);
+
+                // Process the template
+                JxlsHelper.getInstance().processTemplate(context, transformer);
+            }
+        }
+    }
+
+    private static List<Employee> generateRandomEmployees(int count) {
+        // Generate random data for the specified number of records
+        List<Employee> employees = new ArrayList<>();
+        Random random = new Random();
+        for (int i = 1; i <= count; i++) {
+            String name = "Employee" + i;
+            String position = getRandomPosition();
+            int salary = random.nextInt(5000) + 3000; // Random salary between 3000 and 8000
+            employees.add(new Employee(name, position, salary));
+        }
+        return employees;
+    }
+
+    private static String getRandomPosition() {
+        // Define a list of possible positions
+        String[] positions = {"Developer", "Designer", "Manager", "Analyst"};
+        Random random = new Random();
+        // Randomly select a position from the list
+        return positions[random.nextInt(positions.length)];
+    }
+
+    static class Employee {
+        private String name;
+        private String position;
+        private int salary;
+
+        public Employee(String name, String position, int salary) {
+            this.name = name;
+            this.position = position;
+            this.salary = salary;
+        }
+
+        // Add getters for fields
+    }
+}
